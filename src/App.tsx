@@ -20,12 +20,21 @@ function Rand_fruit() {
   const [result, setResult] = React.useState<string | null>(null);
   //log表示
   const [history, setHistory] =  React.useState<{ title: string, Fruit: boolean, YourAnswer: boolean,isCorrect: boolean }[]>([]);
+  const [selectedId, setSelectedId] = React.useState<number[]>([]);
 
   const getRandomInt = (max: number) => Math.floor(Math.random() * max);
   let fruitId: number = getRandomInt(10) + 1;
+  if (selectedId.length > 9) {
+    fruitId = 100;
+  } else {
+    //選択されていないIDを選択するように
+    while (selectedId.includes(fruitId)) {
+      fruitId = getRandomInt(10) + 1;
+    }
+  }
   //Idに対応する要素を取得
-  const id_data = data.find(product => product.id === fruitId);
-  const title = id_data ? id_data.title : 'No product found';
+  const id_data:Product | undefined = data.find(product => product.id === fruitId);
+  const title:string = id_data ? id_data.title : 'No product found';
 
   function checkAnswer(isFruit: boolean) {
     if (id_data) {
@@ -39,6 +48,7 @@ function Rand_fruit() {
         setResult(`Incorrect. ${id_data.title} is ${correctAnswer ? 'a fruit' : 'not a fruit'}.`);
       }
       setHistory(prevHistory => [...prevHistory, { title: id_data.title, Fruit: correctAnswer, YourAnswer: isFruit, isCorrect }]);
+      setSelectedId(prevSelectedId => [...prevSelectedId, id_data.id]);
     } else {
       setResult('No product found');
     }
@@ -46,9 +56,15 @@ function Rand_fruit() {
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <h2>{title} is fruit?</h2>
-      <FruitButton checkAnswer={checkAnswer} />
-      <VegetableButton checkAnswer={checkAnswer} />
+      {fruitId !== 100 ? (
+        <>
+          <h2>{title} is fruit?</h2>
+          <FruitButton checkAnswer={checkAnswer} />
+          <VegetableButton checkAnswer={checkAnswer} />
+        </>
+      ) : (	
+        <h2>finish</h2>	
+      )}
       {result && <p>{result}</p>}
 
       <table style={{ margin: '0 auto', marginTop: '20px', borderCollapse: 'collapse', width: '80%' }}>
