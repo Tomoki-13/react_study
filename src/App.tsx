@@ -20,7 +20,10 @@ function Rand_fruit() {
   const [result, setResult] = React.useState<string | null>(null);
   //log表示
   const [history, setHistory] =  React.useState<{ title: string, Fruit: boolean, YourAnswer: boolean,isCorrect: boolean }[]>([]);
+  //重複許さないためのid管理
   const [selectedId, setSelectedId] = React.useState<number[]>([]);
+  //正解数の管理
+  const [correctCount, setCorrectCount] = React.useState<number>(0);
 
   const getRandomInt = (max: number) => Math.floor(Math.random() * max);
   let fruitId: number = getRandomInt(10) + 1;
@@ -39,11 +42,13 @@ function Rand_fruit() {
   function checkAnswer(isFruit: boolean) {
     if (id_data) {
       const correctAnswer = id_data.isFruit;
-      //isFruit === correctAnswerならtrue
+      //isFruit === correctAnswerならtrue　正解
       const isCorrect = isFruit === correctAnswer;
       //出力のセット
       if (isCorrect) {
+        //正解の処理
         setResult(`Correct! ${id_data.title} is ${correctAnswer ? 'a fruit' : 'not a fruit'}.`);
+        setCorrectCount(prevCount => prevCount + 1); 
       } else {
         setResult(`Incorrect. ${id_data.title} is ${correctAnswer ? 'a fruit' : 'not a fruit'}.`);
       }
@@ -63,10 +68,12 @@ function Rand_fruit() {
           <VegetableButton checkAnswer={checkAnswer} />
         </>
       ) : (	
-        <h2>finish</h2>	
+        <>
+          <h2>finish</h2>	
+          <p>You got {correctCount} correct answers!</p>
+        </>
       )}
       {result && <p>{result}</p>}
-
       <table style={{ margin: '0 auto', marginTop: '20px', borderCollapse: 'collapse', width: '80%' }}>
         <thead>
           <tr>
